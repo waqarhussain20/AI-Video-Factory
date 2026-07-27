@@ -52,3 +52,30 @@ def trim_all_videos(scene_count):
             f"temp/scene{i}_trim.mp4",
             duration_per_scene
         )
+
+
+def merge_videos(scene_count):
+    os.makedirs("temp", exist_ok=True)
+
+    # Create list of trimmed videos
+    with open("temp/video_list.txt", "w", encoding="utf-8") as f:
+        for i in range(1, scene_count + 1):
+            f.write(f"file 'scene{i}_trim.mp4'\n")
+
+    command = [
+        FFMPEG,
+        "-y",
+        "-f", "concat",
+        "-safe", "0",
+        "-i", "video_list.txt",
+        "-c", "copy",
+        "merged.mp4"
+    ]
+
+    subprocess.run(
+        command,
+        cwd="temp",
+        check=True
+    )
+
+    print("Merged Video Created!")
