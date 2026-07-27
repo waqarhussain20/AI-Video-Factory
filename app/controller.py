@@ -3,6 +3,7 @@ from app.settings import load_settings
 from app.keyword_generator import generate_keywords
 from app.media.pexels import search_video, get_best_video_link
 from app.media.downloader import download_file
+from app.voice import generate_voice
 
 print("Controller Loaded")
 
@@ -42,5 +43,10 @@ def generate(script):
                     link,
                     f"temp/scene{i}.mp4"
                 )
+
+    print("\nGenerating Voice...")
+    generate_voice(script)
+
+    print("Voice Generated Successfully!")
 
     return scenes
