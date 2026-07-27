@@ -4,6 +4,7 @@ from app.keyword_generator import generate_keywords
 from app.media.pexels import search_video, get_best_video_link
 from app.media.downloader import download_file
 from app.voice import generate_voice
+from app.video_editor import trim_all_videos
 
 print("Controller Loaded")
 
@@ -48,5 +49,9 @@ def generate(script):
     generate_voice(script)
 
     print("Voice Generated Successfully!")
+
+    print("\nTrimming Videos...")
+    trim_all_videos(len(scenes))
+    print("Video Trimming Finished!")
 
     return scenes
