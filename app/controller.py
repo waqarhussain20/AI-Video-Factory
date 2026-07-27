@@ -1,5 +1,6 @@
 from app.scene_analyzer import analyze_script
 from app.settings import load_settings
+from app.keyword_generator import generate_keywords
 
 print("Controller Loaded")
 
@@ -15,6 +16,12 @@ def generate(script):
     print("\n====== SCENES ======")
 
     for i, scene in enumerate(scenes, start=1):
-        print(f"Scene {i}: {scene}")
+        keyword = generate_keywords(scene)
+
+        print(f"\nScene {i}:")
+        print(scene)
+
+        print("Keyword:")
+        print(keyword)
 
     return scenes
