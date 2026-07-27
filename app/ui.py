@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-
+from app.controller import generate
 
 def generate_video():
     script = script_box.get("1.0", tk.END).strip()
@@ -9,7 +9,14 @@ def generate_video():
         messagebox.showwarning("Warning", "Please paste your script first!")
         return
 
-    status.config(text="Status: Script Loaded ✅")
+    print("Button Clicked")
+    print("Script:", script)
+
+    generate(script)
+
+    print("Generate Finished")
+
+    status.config(text="Status: Script Analysed ✅")
 
 
 def run_app():
