@@ -1,0 +1,15 @@
+{
+
+    "voice": "male",
+
+    "quality": "fast",
+
+    "stock_provider": "pexels",
+
+    "output_folder": "output",
+
+    "pexels_api_key": "",
+
+    "pixabay_api_key": ""
+
+}
