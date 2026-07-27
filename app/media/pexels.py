@@ -33,3 +33,18 @@ def search_video(api_key, query):
     print("URL:", video["url"])
 
     return video
+
+
+def get_best_video_link(video):
+    if not video:
+        return None
+
+    files = video.get("video_files", [])
+
+    if not files:
+        return None
+
+    # Highest resolution
+    files = sorted(files, key=lambda x: x.get("width", 0), reverse=True)
+
+    return files[0]["link"]
