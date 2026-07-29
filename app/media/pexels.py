@@ -36,6 +36,7 @@ def search_video(api_key, query):
 
 
 def get_best_video_link(video):
+
     if not video:
         return None
 
@@ -44,7 +45,31 @@ def get_best_video_link(video):
     if not files:
         return None
 
-    # Highest resolution
-    files = sorted(files, key=lambda x: x.get("width", 0), reverse=True)
+    # Prefer 720p–1080p videos
+    suitable = []
 
-    return files[0]["link"]
+    for file in files:
+
+        width = file.get("width", 0)
+
+        if 700 <= width <= 1920:
+            suitable.append(file)
+
+    if suitable:
+
+        suitable = sorted(
+            suitable,
+            key=lambda x: x["width"],
+            reverse=True
+        )
+
+        return suitable[0]["link"]
+
+    # Fallback
+    files = sorted(
+        files,
+        key=lambda x: x["width"],
+        reverse=True
+    )
+
+    return files[-1]["link"]

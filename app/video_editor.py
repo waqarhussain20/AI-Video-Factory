@@ -39,8 +39,8 @@ def trim_video(input_file, output_file, duration):
 
 
 def trim_all_videos(scene_count):
-    voice_duration = get_duration("temp/voice.wav")
 
+    voice_duration = get_duration("temp/voice.wav")
     duration_per_scene = voice_duration / scene_count
 
     print(f"\nVoice Duration: {voice_duration:.2f} sec")
@@ -54,15 +54,29 @@ def trim_all_videos(scene_count):
         )
 
 
-def normalize_video(input_file, output_file):
+def normalize_video(input_file, output_file, aspect):
+
+    if aspect == "9:16 Shorts":
+
+        video_filter = (
+            "scale=1080:1920:force_original_aspect_ratio=decrease,"
+            "pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black,"
+            "setsar=1"
+        )
+
+    else:
+
+        video_filter = (
+            "scale=1920:1080:force_original_aspect_ratio=decrease,"
+            "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black,"
+            "setsar=1"
+        )
+
     command = [
         FFMPEG,
         "-y",
         "-i", input_file,
-        "-vf",
-        "scale=1920:1080:force_original_aspect_ratio=decrease,"
-        "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black,"
-        "setsar=1",
+        "-vf", video_filter,
         "-r", "30",
         "-c:v", "libx264",
         "-preset", "fast",
@@ -76,24 +90,29 @@ def normalize_video(input_file, output_file):
     print(f"Normalized: {output_file}")
 
 
-def normalize_all_videos(scene_count):
+def normalize_all_videos(scene_count, aspect):
+
     print("\nNormalizing Videos...")
 
     for i in range(1, scene_count + 1):
+
         normalize_video(
             f"temp/scene{i}_trim.mp4",
-            f"temp/scene{i}_ready.mp4"
+            f"temp/scene{i}_ready.mp4",
+            aspect
         )
 
     print("All Videos Normalized!")
 
 
 def merge_videos(scene_count):
+
     os.makedirs("temp", exist_ok=True)
 
     list_file = os.path.join("temp", "video_list.txt")
 
     with open(list_file, "w", encoding="utf-8") as f:
+
         for i in range(1, scene_count + 1):
             f.write(f"file 'scene{i}_ready.mp4'\n")
 
@@ -117,27 +136,39 @@ def merge_videos(scene_count):
 
 
 def add_voice():
+
     os.makedirs("output", exist_ok=True)
 
     command = [
         FFMPEG,
         "-y",
-
         "-i", "temp/merged.mp4",
-        "-i", "temp/voice.mp3",
+        "-i", "temp/voice.wav",
 
         "-map", "0:v:0",
         "-map", "1:a:0",
 
         "-c:v", "copy",
-        "-c:a", "copy",
+        "-c:a", "aac",
+        "-b:a", "192k",
 
         "-shortest",
 
         "output/final_video.mp4"
     ]
 
-    subprocess.run(command, check=True)
+    result = subprocess.run(
+        command,
+        capture_output=True,
+        text=True
+    )
+
+    print("\n========== FFMPEG OUTPUT ==========")
+    print(result.stdout)
+    print(result.stderr)
+    print("===================================")
+
+    result.check_returncode()
 
     print("\n==============================")
     print("Final Video Created!")

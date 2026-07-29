@@ -11,18 +11,22 @@ from app.video_editor import (
     add_voice
 )
 
-import subprocess
-
-FFMPEG = r"C:\ffmpeg\bin\ffmpeg.exe"
-
 print("Controller Loaded")
 
 
-def generate(script):
+def generate(script, voice, quality, language, aspect):
+
     settings = load_settings()
 
     safe_settings = settings.copy()
     safe_settings["pexels_api_key"] = "***HIDDEN***"
+
+    print("\n========== USER SETTINGS ==========")
+    print("Voice:", voice)
+    print("Quality:", quality)
+    print("Language:", language)
+    print("Aspect:", aspect)
+    print("===================================\n")
 
     print("Current Settings:")
     print(safe_settings)
@@ -47,59 +51,58 @@ def generate(script):
         )
 
         if video:
+
             link = get_best_video_link(video)
 
             if link:
+
                 download_file(
                     link,
                     f"temp/scene{i}.mp4"
                 )
 
-    # -------------------------
-    # Generate Voice
-    # -------------------------
     print("\nGenerating Voice...")
-    generate_voice(script)
+
+    generate_voice(
+        text=script,
+        language=language,
+        voice=voice
+    )
+
     print("Voice Generated Successfully!")
 
-    # Convert WAV -> MP3
-    print("Converting Voice to MP3...")
-
-    subprocess.run([
-        FFMPEG,
-        "-y",
-        "-i", "temp/voice.wav",
-        "temp/voice.mp3"
-    ], check=True)
-
-    print("Voice MP3 Ready!")
-
-    # -------------------------
-    # Trim
-    # -------------------------
     print("\nTrimming Videos...")
-    trim_all_videos(len(scenes))
+
+    trim_all_videos(
+        len(scenes)
+    )
+
     print("Video Trimming Finished!")
 
-    # -------------------------
-    # Normalize
-    # -------------------------
     print("\nNormalizing Videos...")
-    normalize_all_videos(len(scenes))
+
+    normalize_all_videos(
+        len(scenes),
+        aspect
+    )
+
     print("Video Normalization Finished!")
 
-    # -------------------------
-    # Merge
-    # -------------------------
     print("\nMerging Videos...")
-    merge_videos(len(scenes))
+
+    merge_videos(
+        len(scenes)
+    )
+
     print("Video Merge Finished!")
 
-    # -------------------------
-    # Add Voice
-    # -------------------------
     print("\nAdding Voice...")
+
     add_voice()
+
+    print("\n==============================")
     print("Final Video Created!")
+    print("Location: output/final_video.mp4")
+    print("==============================")
 
     return scenes
